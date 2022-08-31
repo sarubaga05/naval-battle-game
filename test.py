@@ -67,3 +67,4 @@ user1 = User(board1, board2)
 print(user1.move())
 '''
 
+#Проверка класса Game

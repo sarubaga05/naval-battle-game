@@ -1,5 +1,6 @@
 # Главный файл проекта
 from random import randrange
+import time
 
 
 class BoardOutException(Exception):  # Класс исключение: выбор точки за границей поля
@@ -174,3 +175,59 @@ class User(Player):
             new_x = int(new_x)
             new_y = int(new_y)
             return Dot(new_x - 1, new_y - 1)
+
+
+class Game:
+    def __init__(self):
+        user_board = self.random_board()
+        ai_board = self.random_board()
+        self.user = User(user_board, ai_board)
+        self.ai = AI(ai_board, user_board)
+        ai_board.hid = True
+
+    def random_board(self):
+        board = None
+        while board is None:
+            board = self.spread_ship()
+        return board
+
+    def spread_ship(self):
+        board = Board()
+        num_of_attempts = 0
+        ship_lenght = [3, 2, 2, 1, 1, 1, 1]
+        for lenght in ship_lenght:
+            while True:
+                num_of_attempts += 1
+                if num_of_attempts > 3000:
+                    return None
+                ship = Ship(Dot(randrange(6), randrange(6)), lenght, randrange(2))
+                try:
+                    board.add_ship(ship)
+                    break
+                except WrongShipException:
+                    pass
+        board.clean_used_dots()
+        return board
+
+    def greet(self):
+        print('Приветствую вас в игре Морской бой!')
+        time.sleep(1)
+        print('...')
+        time.sleep(1)
+        print('Правила очень просты - уничтожить все корабли противника')
+        time.sleep(1)
+        print('Игра проходит против компьютера')
+        time.sleep(1)
+        print('Ходы идут по очереди. Если кто-то попал в корабль, то делает ход повторно')
+        time.sleep(1)
+        print('При ходе нужны ввести координаты - чилос от 1 до 6')
+        time.sleep(1)
+        print('Удачной игры!')
+        time.sleep(1)
+
+    def loop(self):
+        pass
+
+    def start(self):
+        self.greet()
+        self.loop()
