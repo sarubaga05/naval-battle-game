@@ -129,3 +129,48 @@ class Board:
 
     def clean_used_dots(self):  # Очистка списка использованных точек после формирования доскиы
         self.used_dots = []
+
+
+class Player:  # Общие методы для игрока и AI
+    def __init__(self, my_board, enemy_board):
+        self.my_board = my_board
+        self.enemy_board = enemy_board
+
+    def ask(self):
+        pass
+
+    def move(self):
+        while True:
+            try:
+                selected_dot = self.ask()
+                shot1 = self.enemy_board.shot(selected_dot)
+                return shot1
+            except BoardOutException as e:
+                print(e)
+
+
+class AI(Player):  # Случайный выбор точки для выстрела
+    def ask(self):
+        new_x = randrange(6)
+        new_y = randrange(6)
+        print(f'Компьютер выстрелил в точку {new_x + 1} {new_y + 1}')
+        return Dot(new_x, new_y)
+
+
+class User(Player):
+    def ask(self):
+        while True:
+            new_x = input("Введите координату x: ")
+            new_y = input("Введите координату y: ")
+
+            if not(new_x.isdigit()) or not(new_y.isdigit()):
+                print('Были введены не числа.')
+                continue
+
+            if len(new_x) > 1 or len(new_y) > 1:
+                print('Числа введены некорректно.')
+                continue
+
+            new_x = int(new_x)
+            new_y = int(new_y)
+            return Dot(new_x - 1, new_y - 1)

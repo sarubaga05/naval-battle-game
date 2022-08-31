@@ -55,3 +55,15 @@ board1 = Board()
 #print(board1.shot(dot3))
 '''
 
+# Проверка классов Player, AI, User
+'''
+board1 = Board()
+board2 = Board()
+ai1 = AI(board2, board1)
+user1 = User(board1, board2)
+#print(ai1.ask())
+#print(user1.ask())
+#print(ai1.move())
+print(user1.move())
+'''
+
