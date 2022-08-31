@@ -10,6 +10,10 @@ class WrongCellException(Exception):  # Класс исключение: выб�
     pass
 
 
+class WrongShipException(Exception):  # Класс исключение: вызываем при ошибке взаимодействия с кораблем
+    pass
+
+
 class Dot:  # Класс точек на поле
     def __init__(self, x, y):
         self.x = x
@@ -43,3 +47,85 @@ class Ship:  # Класс корабля
 
             ship_dots.append(Dot(x1, y1))
         return ship_dots
+
+
+class Board:
+    def __init__(self, hid=False):
+        self.cell_list = [['O', 'O', 'O', 'O', 'O', 'O'],
+                          ['O', 'O', 'O', 'O', 'O', 'O'],
+                          ['O', 'O', 'O', 'O', 'O', 'O'],
+                          ['O', 'O', 'O', 'O', 'O', 'O'],
+                          ['O', 'O', 'O', 'O', 'O', 'O'],
+                          ['O', 'O', 'O', 'O', 'O', 'O']]
+        self.ship_list = []
+        self.hid = hid
+        self.count_ship = 7
+        self.used_dots = []
+
+    def add_ship(self, ship):  # Добавление корабля
+        for dot in ship.dots:
+            if self.out(dot) or dot in self.used_dots:
+                raise WrongShipException()
+        for dot in ship.dots:
+            self.cell_list[dot.x][dot.y] = "■"
+            self.used_dots.append(dot)
+
+        self.ship_list.append(ship)
+        self.contour(ship)
+
+    def contour(self, ship, verb=False):  # Обводка корабля
+        near = [(-1, -1), (-1, 0), (-1, 1),
+                (0, -1), (0, 0), (0, 1),
+                (1, -1), (1, 0), (1, 1)
+                ]
+        for dot in ship.dots:
+            for x1, y1 in near:
+                new_dot = Dot(dot.x + x1, dot.y + y1)
+                if not (self.out(new_dot)) and not (new_dot in self.used_dots):
+                    if verb:
+                        self.cell_list[new_dot.x][new_dot.y] = "T"
+                    self.used_dots.append(new_dot)
+
+    def show_board(self):  # Вывод игрового поля
+        brd = ""
+        brd += "  | 1 | 2 | 3 | 4 | 5 | 6 |"
+        for i, row in enumerate(self.cell_list):
+            brd += f"\n{i + 1} | " + " | ".join(row) + " |"
+
+        if self.hid:
+            brd = brd.replace("■", "O")
+        return brd
+
+    def out(self, dot):  # Проверка: выходит ли выбранная ячейка за границы игрового поля
+        if not (0 <= dot.x < 6) or not (0 <= dot.y < 6):
+            return True
+        else:
+            return False
+
+    def shot(self, dot):  # Выстрел по игровому полю
+        if self.out(dot):
+            raise BoardOutException()
+        if dot in self.used_dots:
+            raise WrongCellException()
+
+        self.used_dots.append(dot)
+
+        for ship in self.ship_list:
+            if dot in ship.dots:
+                ship.hp -= 1
+                self.cell_list[dot.x][dot.y] = "X"
+                if ship.hp == 0:
+                    self.count_ship -= 1
+                    self.contour(ship, verb=True)
+                    print("Подбил!")
+                    return False
+                else:
+                    print("Ранил!")
+                    return True
+
+        self.cell_list[dot.x][dot.y] = "T"
+        print("Мимо!")
+        return False
+
+    def clean_used_dots(self):  # Очистка списка использованных точек после формирования доскиы
+        self.used_dots = []

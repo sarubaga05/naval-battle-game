@@ -26,3 +26,32 @@ print()
 for d in ship2:
     print(d)
 '''
+
+# Проверка класса Board
+'''
+dot1 = Dot(1, 1)
+dot2 = Dot(2, 1)
+dot3 = Dot(6, 6)
+ship1 = Ship(2, dot2, 1)
+board1 = Board()
+# Вывод доски
+#print(board1.show_board())
+# Добавление корабля
+#board1.add_ship(ship1)
+#board1.clean_used_dots()
+#board1.contour(ship1, True)
+#print(board1.show_board())
+#board1.hid = True
+#print(board1.show_board())
+# Проверка выхода за границу
+#print(board1.out(dot3))
+# Проверка выстрела
+#board1.add_ship(ship1)
+#board1.clean_used_dots()
+#print(board1.shot(dot2))
+#print(board1.show_board())
+#print(board1.shot(dot1))
+#print(board1.show_board())
+#print(board1.shot(dot3))
+'''
+
