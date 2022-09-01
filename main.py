@@ -119,7 +119,7 @@ class Board:
                     self.count_ship -= 1
                     self.contour(ship, verb=True)
                     print("Подбил!")
-                    return False
+                    return True
                 else:
                     print("Ранил!")
                     return True
@@ -146,8 +146,10 @@ class Player:  # Общие методы для игрока и AI
                 selected_dot = self.ask()
                 shot1 = self.enemy_board.shot(selected_dot)
                 return shot1
-            except BoardOutException as e:
-                print(e)
+            except BoardOutException:
+                print('Такой ячейки на поле нет!')
+            except WrongCellException:
+                print('Данную ячейку нельзя использовать!')
 
 
 class AI(Player):  # Случайный выбор точки для выстрела
@@ -161,8 +163,8 @@ class AI(Player):  # Случайный выбор точки для выстр�
 class User(Player):
     def ask(self):
         while True:
-            new_x = input("Введите координату x: ")
-            new_y = input("Введите координату y: ")
+            new_x = input("Введите координату x (номер строки): ")
+            new_y = input("Введите координату y (номер столбца): ")
 
             if not(new_x.isdigit()) or not(new_y.isdigit()):
                 print('Были введены не числа.')
@@ -177,7 +179,7 @@ class User(Player):
             return Dot(new_x - 1, new_y - 1)
 
 
-class Game:
+class Game:  # Класс игрового процесса
     def __init__(self):
         user_board = self.random_board()
         ai_board = self.random_board()
@@ -185,13 +187,13 @@ class Game:
         self.ai = AI(ai_board, user_board)
         ai_board.hid = True
 
-    def random_board(self):
+    def random_board(self):  # Генерация доски
         board = None
         while board is None:
             board = self.spread_ship()
         return board
 
-    def spread_ship(self):
+    def spread_ship(self):  # Расстановка кораблей на поле
         board = Board()
         num_of_attempts = 0
         ship_lenght = [3, 2, 2, 1, 1, 1, 1]
@@ -200,7 +202,7 @@ class Game:
                 num_of_attempts += 1
                 if num_of_attempts > 3000:
                     return None
-                ship = Ship(Dot(randrange(6), randrange(6)), lenght, randrange(2))
+                ship = Ship(lenght, Dot(randrange(6), randrange(6)), randrange(2))
                 try:
                     board.add_ship(ship)
                     break
@@ -209,25 +211,73 @@ class Game:
         board.clean_used_dots()
         return board
 
-    def greet(self):
+    def greet(self):  # Приветствие при старте игры
         print('Приветствую вас в игре Морской бой!')
-        time.sleep(1)
+        time.sleep(2)
         print('...')
-        time.sleep(1)
+        time.sleep(2)
         print('Правила очень просты - уничтожить все корабли противника')
-        time.sleep(1)
+        time.sleep(2)
         print('Игра проходит против компьютера')
-        time.sleep(1)
+        time.sleep(2)
         print('Ходы идут по очереди. Если кто-то попал в корабль, то делает ход повторно')
-        time.sleep(1)
-        print('При ходе нужны ввести координаты - чилос от 1 до 6')
-        time.sleep(1)
+        time.sleep(2)
+        print('При ходе нужны ввести координаты - число от 1 до 6')
+        time.sleep(2)
         print('Удачной игры!')
-        time.sleep(1)
+        time.sleep(2)
 
-    def loop(self):
-        pass
+    def loop(self):  # Игровой цикл
+        flag = 0
+        while True:
+            print('...')
+            print('Ваша доска:')
+            print(self.user.my_board.show_board())
+            time.sleep(1)
+            print('...')
+            print('Доска компьютера:')
+            print(self.ai.my_board.show_board())
+            time.sleep(1)
+            if flag % 2 == 0:
+                print('...')
+                print('Ваш ход')
+                new_move = self.user.move()
+                time.sleep(2)
+            else:
+                print('...')
+                print('Ход компьютера')
+                new_move = self.ai.move()
+                time.sleep(2)
+            if new_move:
+                flag -= 1
 
-    def start(self):
+            if self.ai.my_board.count_ship == 0:
+                print('...')
+                print('Ваша доска:')
+                print(self.user.my_board.show_board())
+                time.sleep(1)
+                print('...')
+                print('Доска компьютера:')
+                print(self.ai.my_board.show_board())
+                time.sleep(1)
+                print('...')
+                print('Вы победили!')
+                break
+
+            if self.user.my_board.count_ship == 0:
+                print('...')
+                print('Ваша доска:')
+                print(self.user.my_board.show_board())
+                time.sleep(1)
+                print('...')
+                print('Доска компьютера:')
+                print(self.ai.my_board.show_board())
+                time.sleep(1)
+                print('...')
+                print('Победа машины!')
+                break
+            flag += 1
+
+    def start(self):  # Запуск игры
         self.greet()
         self.loop()

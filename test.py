@@ -68,3 +68,11 @@ print(user1.move())
 '''
 
 #Проверка класса Game
+
+game1 = Game()
+#board1 = game1.random_board()
+#print(board1.show_board())
+#game1.greet()
+
+# Старт игры
+game1.start()
